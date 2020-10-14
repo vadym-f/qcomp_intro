@@ -1,0 +1,12 @@
+gateX1: (0,0)(1,0)
+gateX2: (1,0)(0,0)
+gateI1: (1,0)(0,0)
+gateI2: (0,0)(1,0)
+gate1: (0,0)(1,0)
+gate2: (1,0)(0,0)
+prob: 1
+gate1: (1,0)(0,0)
+gate2: (0,0)(1,0)
+prob: 0
+Solution X: 0
+Solution I: 1
