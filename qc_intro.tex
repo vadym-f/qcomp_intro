@@ -1,0 +1,242 @@
+% Vadym Fedyukovych  2020
+% You are free to Share and Adapt Under the following terms: Attribution.
+% Attribution 4.0 International (CC BY 4.0)
+%
+\documentclass[14pt]{beamer}
+
+\usepackage{cmap}
+\usepackage{droid} % XCharter tempora PTSans
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian,english]{babel}
+
+\usepackage{amssymb,amsmath,amsthm,url}
+\usepackage{listings}
+
+\usepackage{tikz}
+\usetikzlibrary{quantikz}
+
+\author{Вадим Федюкович}
+\title{Квантовые вычисления \\
+  практическое ведение \\
+  \small{\url{https://github.com/vadym-f/qcomp_intro}}}
+\date{15 октября 2020}
+
+\usepackage{hyperref}
+\hypersetup{
+  pdfauthor={Vadym Fedyukovych},
+%  pdftitle={QuantumcomputingIntro},
+%  pdftitle={\@title}
+  pdfkeywords={Licensed CC BY 4.0},
+  colorlinks=true,
+  urlcolor=blue,
+  unicode
+}
+
+\begin{document}
+\frame  {
+\titlepage
+}
+
+\frame {
+  \frametitle{Аксиомы и ожидаемые знания}
+  \begin{itemize}
+  \item
+      векторы, базис, амплитуды, тензорное произведение
+  \item
+      комплексное сопряжение, скалярное произведение, вероятность, Гильбертово пространство
+  \item
+      операторы $=$ матрицы, собственные векторы и значения
+  \item
+      измерение и 'разрушение' исходного состояния, проектор
+  \item
+      суперпозиция и 'вычисления' одновременно на всех состояниях
+  \end{itemize}
+
+  {\small \href{http://www.mathnet.ru/conf1820}
+               {Математические основы квантовой криптографии,
+                А.С.Трушечкин, Д.А.Кронберг, МИАН}}
+% Bell/CHSH
+}
+
+\frame {
+  \frametitle{Модели вычислений}
+  \begin{itemize}
+  \item
+      'Гейты' и компьютер с Джозефсоновскими кубитами
+  \item
+      Поиск минимального состояния, \href{https://arxiv.org/pdf/1302.5843.pdf}{D-Wave}
+  \item
+      Гауссовы состояния фотонов, \href{https://www.xanadu.ai/research}{Xanadu}
+  \item
+      'Топологические' вычисления с косами/braid, \href{https://www.microsoft.com/en-us/quantum/microsoft-quantum-labs}{anion/majorana Microsoft}
+  \item
+      Коммуникации и 'квантовый Интернет': модели 'вычислительного центра' и 'мобилка для каждого'
+  \end{itemize}
+
+  {\small \href{https://arxiv.org/abs/1904.06560}
+               {A Quantum Engineer's Guide to Superconducting Qubits}}
+}
+
+\frame {
+  \frametitle{``Таблица умножения''}
+  \begin{gather*}
+    \ket{0} = \begin{bmatrix} 1 \\ 0 \end{bmatrix},  \quad
+    \ket{1} = \begin{bmatrix} 0 \\ 1 \end{bmatrix}
+\\
+    X = \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix},  \quad
+    Z = \begin{bmatrix} 1 & 0 \\ 0 & -1 \end{bmatrix},  \quad
+    H = \frac{1}{\sqrt{2}} \begin{bmatrix} 1 & 1 \\ 1 & -1 \end{bmatrix}
+\\    
+    X \ket{0} = \ket{1},  \;
+    X \ket{1} = \ket{0}
+\quad
+    Z \ket{0} = \ket{0},  \;
+    Z \ket{1} = -\ket{1}
+\\
+    H \ket{0} = \frac{\ket{0} + \ket{1}}{\sqrt{2}},  \quad
+    H \ket{1} = \frac{\ket{0} - \ket{1}}{\sqrt{2}}
+  \end{gather*}
+  \mbox{$CNOT$ (на диаграмме $\oplus$ и 'управляющий' кубит):} \\
+  \mbox{если 'control' $ = \ket{1}$ применяет $X$ к 'target'-кубиту.}
+\\
+  Состояние двух двухуровневых систем и тензорное произведение: $\ket{00}_{AB} = \ket{0}_A \otimes \ket{0}_B$
+\\
+{\small
+  \href{https://biblio.mccme.ru/node/1547}
+       {Классические и квантовые вычисления}
+}
+}
+% KAU summer school 2018
+
+\frame {
+  \frametitle{Задача Дойча}
+
+  \begin{quantikz}
+    \lstick{\ket{0}} & \gate{H}     & \gate[wires=2][2cm]{f()}
+                                      \gateinput{$x$}
+                                      \gateoutput{$x$}
+    \slice{}    & \gate{H} & \meter{} & \cw
+    \begin{cases}
+       \text{constant:} 0 \\
+       \text{balanced:} 1
+    \end{cases}
+\\
+    \lstick{\ket{1}} & \gate{H}     &
+                                      \gateinput{$y$}
+                                      \gateoutput{$y \oplus f(x)$}
+                & \qw      &&
+  \end{quantikz}
+  \begin{gather*}
+%    1: \;
+%   \frac{\ket{0} + \ket{1}}{\sqrt{2}} \otimes \frac{\ket{0} - \ket{1}}{\sqrt{2}} =
+    (\ket{0} + \ket{1}) \otimes (\ket{0} - \ket{1}) =
+    \ket{00} + \ket{10} - \ket{01} - \ket{11}
+\\
+%    2: \;
+    \ket{00 \oplus f(0)} + \ket{10 \oplus f(1)} - \ket{01 \oplus f(0)} - \ket{11 \oplus f(1)} =
+\\
+    \ket{0, f(0)} + \ket{1, f(1)} - \ket{0, \overline{f(0)}} - \ket{1, \overline{f(1)}} =
+\\
+    \ket{0} \otimes (\ket{f(0)} - \ket{\overline{f(0)}}) +
+    \ket{1} \otimes (\ket{f(1)} - \ket{\overline{f(1)}}) =
+\\
+    (\ket{0} \pm \ket{1}) \otimes (\ket{f_0} - \ket{\overline f_0})
+%    \begin{cases}
+%       \text{f() is constant: } (\ket{0} + \ket{1}) \otimes (\ket{f} - \ket{\bar f})\\
+%       \text{f() is balanced: } (\ket{0} - \ket{1}) \otimes ()
+%    \end{cases}
+  \end{gather*}
+}
+
+\frame {
+  \frametitle{Телепортация -- 1}
+
+  \begin{quantikz}
+    \lstick{\ket{\psi}} & \qw \slice{$A_1$} & \qw \slice{$A_2$} & \ctrl{1} \slice{$A_3$} & \gate{H} \slice{$A_4$} & \meter{$M_1$} \slice{$B$} & \cw & \cwbend{2} & \rstick{Initial}
+    \\
+    \lstick{\ket{0}} &   \gate{H} & \ctrl{1}  &  \targ{} & \qw & \meter{$M_2$} & \cwbend{1} &&&&
+    \\
+    \lstick{\ket{0}} & \qw & \targ{} & \qw & \qw & \qw & \gate{X} & \gate{Z} & \rstick{New} \qw
+  \end{quantikz}
+
+  \begin{gather*}
+    \ket{\psi} \otimes \frac{\ket{0} + \ket{1}}{\sqrt{2}} \otimes \ket{0},  \quad
+    (\alpha \ket{0} + \beta \ket{1}) \otimes \frac{\ket{00} + \ket{11}}{\sqrt{2}}
+\\
+    A_3: \;
+    \alpha \ket{0} \otimes \frac{\ket{00} + \ket{11}}{\sqrt{2}} +
+    \beta \ket{1} \otimes \frac{\ket{10} + \ket{01}}{\sqrt{2}}
+  \end{gather*}
+}
+
+\frame {
+  \frametitle{Телепортация -- 2}
+
+  \begin{gather*}
+%    A_4: \;
+    \frac{\alpha (\ket{0} + \ket{1})(\ket{00} + \ket{11}) +
+          \beta (\ket{0} - \ket{1})(\ket{10} + \ket{01})  }{2}
+  \end{gather*}
+
+\begin{tabular}{ | c | c | c | c | }
+\hline
+ $M_1$ $M_2$    &  $B$                 & Action  &  Result  \\
+\hline
+ 00  & $\alpha \ket{0} + \beta \ket{1}$ &  $1$  & $\alpha \ket{0} + \beta \ket{1}$ \\ 
+ 01  & $\alpha \ket{1} + \beta \ket{0}$ &  $X$  & $\alpha \ket{0} + \beta \ket{1}$ \\  
+ 10  & $\alpha \ket{0} - \beta \ket{1}$ &  $Z$  & $\alpha \ket{0} + \beta \ket{1}$ \\  
+ 11  & $\alpha \ket{1} - \beta \ket{0}$ &  $ZX$ & $\alpha \ket{0} + \beta \ket{1}$ \\
+\hline
+\end{tabular}
+
+\vskip5pt
+
+{\small
+\href{http://www.rec.vsu.ru/rus/ecourse/quantcomp/sem8.pdf}
+     {``Квантовые компьютеры'', Семинар 8, алг.Дойча}
+
+\href{http://www.rec.vsu.ru/rus/ecourse/quantcomp/sem10.pdf}
+     {``Квантовые компьютеры'', Семинар 10, телепортация}
+\\
+%\vskip5pt
+  \href{https://mipt.ru/science/labs/QIT-lab/for-students.php}
+     {С. Н. Филиппов, глава 13}
+}
+}
+
+\frame {
+  \frametitle{Codeforces / Microsoft}
+
+  \url{https://codeforces.com/contest/1356}
+  {Соревнование лето 2020 и тренировка}
+\\
+\vskip5pt
+
+  \href{https://codeforces.com/blog/entry/77614}
+       {Анонс соревнования 2020}
+\\
+  Соревнования Summer 2018 и Winter 2019, вместе с тренировками и решениями прошлых задач.
+}
+
+\frame {
+  \frametitle{Перспективы}
+
+  \href{https://docs.microsoft.com/en-us/learn/modules/solve-graph-coloring-problems-grovers-search/}
+  {Graph coloring with Grover's search}
+\\
+  \href{https://github.com/epiqc/ScaffCC/}
+  {Scaffold компилятор на основе LLVM}
+\\
+  \href{https://arxiv.org/pdf/1207.0511v5.pdf}
+  {Модульное умножение для алг.Шора}
+\\
+  \href{https://arxiv.org/abs/quant-ph/0407095}
+  {Эллиптические кривые для DLOG}
+\\
+  \href{https://arxiv.org/abs/2001.04383}
+  {mip*=re}
+}
+
+\end{document}
+
